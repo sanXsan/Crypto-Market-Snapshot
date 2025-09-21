@@ -10,17 +10,17 @@ export default function Home() {
           property="og:description"
           content="Crypto market snapshot for Base ecosystem. Check BTC, ETH, DEGEN, AERO, Gas, TX, Wallets."
         />
-        <meta
-          property="og:image"
-          content="/cms.png"
-        />
+          <meta
+    property="og:image"
+    content="https://crypto-market-snapshot.vercel.app/cms.png"
+  />
 
-        {/* Frame Metadata for Warpcast */}
-        <meta name="fc:frame" content="vNext" />
-        <meta
-          name="fc:frame:image"
-          content="/cms.png"
-        />
+  {/* Warpcast Frame Metadata */}
+  <meta name="fc:frame" content="vNext" />
+  <meta
+    name="fc:frame:image"
+    content="https://crypto-market-snapshot.vercel.app/cms.png"
+  />
 
         {/* Buttons */}
         <meta name="fc:frame:button:1" content="BTC/ETH" />
