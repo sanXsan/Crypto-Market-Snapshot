@@ -1,25 +1,52 @@
-export function renderFrame(title, desc, buttons = []) {
-  // buttons: array of {label, target}
-  const buttonsMeta = buttons
-    .map((btn, i) => `<meta property="fc:frame:button:${i+1}" content="${btn.label}" />
-                      <meta property="fc:frame:button:${i+1}:action" content="post" />
-                      <meta property="fc:frame:button:${i+1}:target" content="${btn.target}" />`)
-    .join("\n");
+import { ImageResponse } from "@vercel/og"
 
-  return `
-    <html>
-      <head>
-        <meta property="og:title" content="${title}" />
-        <meta property="og:description" content="${desc}" />
-        <meta property="og:image" content="https://dummyimage.com/600x400/000/fff&text=${encodeURIComponent(title)}" />
-        <meta property="fc:frame" content="vNext" />
-        <meta property="fc:frame:image" content="https://dummyimage.com/600x400/000/fff&text=${encodeURIComponent(title)}" />
-        ${buttonsMeta}
-      </head>
-      <body>
-        <h1>${title}</h1>
-        <p>${desc}</p>
-      </body>
-    </html>
-  `;
+export const config = {
+  runtime: "edge",
+}
+
+export default async function handler(req) {
+  try {
+    const { searchParams } = new URL(req.url)
+    const title = searchParams.get("title") || "Crypto Market Snapshot"
+    const desc = searchParams.get("desc") || "Base ecosystem data"
+
+    return new ImageResponse(
+      (
+        <div
+          style={{
+            display: "flex",
+            width: "100%",
+            height: "100%",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            background: "linear-gradient(135deg, #141E30 0%, #243B55 100%)",
+            color: "white",
+            fontSize: 40,
+            fontFamily: "Arial, sans-serif",
+          }}
+        >
+          <div style={{ fontSize: 60, fontWeight: "bold", marginBottom: 20 }}>
+            {title}
+          </div>
+          <div style={{ fontSize: 36 }}>{desc}</div>
+          <div
+            style={{
+              marginTop: 40,
+              fontSize: 28,
+              opacity: 0.7,
+            }}
+          >
+            Powered by Base
+          </div>
+        </div>
+      ),
+      {
+        width: 800,
+        height: 418,
+      }
+    )
+  } catch (err) {
+    return new Response("Failed to generate image", { status: 500 })
+  }
 }
