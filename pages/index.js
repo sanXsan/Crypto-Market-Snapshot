@@ -12,14 +12,14 @@ export default function Home() {
         />
         <meta
           property="og:image"
-          content="https://i.ibb.co/9hD9R9R/crypto.png"
+          content="/cms.png"
         />
 
         {/* Frame Metadata for Warpcast */}
         <meta name="fc:frame" content="vNext" />
         <meta
           name="fc:frame:image"
-          content="https://i.ibb.co/9hD9R9R/crypto.png"
+          content="/cms.png"
         />
 
         {/* Buttons */}
