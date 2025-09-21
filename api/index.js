@@ -1,37 +1,80 @@
-import fetch from "node-fetch";
+import express from "express";
+import { getTokenPrices } from "./api/coingecko.js";
+import { getDailyTxCount, getGasAverage, getActiveWallets } from "./api/basescan.js";
+import { renderFrame } from "./frames/render.js";
 
-export default async function handler(req, res) {
-  const coin = (req.query.coin || "bitcoin").toLowerCase();
+const app = express();
 
-  // Ambil data harga dari CoinGecko
-  const url = `https://api.coingecko.com/api/v3/simple/price?ids=${coin}&vs_currencies=usd&include_24hr_change=true&include_market_cap=true&include_24hr_vol=true`;
-  const data = await fetch(url).then(r => r.json());
+// Default Frame: BTC & ETH
+app.get("/", async (req, res) => {
+  const prices = await getTokenPrices();
+  const btc = prices.bitcoin.usd;
+  const eth = prices.ethereum.usd;
 
-  if (!data[coin]) {
-    return res.status(404).send("Coin not found");
-  }
+  const html = renderFrame(
+    "BTC & ETH Snapshot",
+    `BTC: $${btc} | ETH: $${eth}`,
+    [
+      { label: "DEGEN", target: "/degen" },
+      { label: "AERO", target: "/aero" },
+      { label: "Gas", target: "/gas" },
+      { label: "Tx", target: "/tx" },
+      { label: "Wallets", target: "/wallets" }
+    ]
+  );
+  res.send(html);
+});
 
-  const price = data[coin].usd;
-  const change = data[coin].usd_24h_change.toFixed(2);
-  const marketCap = (data[coin].usd_market_cap / 1e9).toFixed(2);
-  const volume = (data[coin].usd_24h_vol / 1e9).toFixed(2);
+// DEGEN
+app.get("/degen", async (req, res) => {
+  const prices = await getTokenPrices();
+  const price = prices["degen-base"].usd;
 
-  // Generate sparkline chart via QuickChart (dummy random data untuk sekarang)
-  const chartUrl = `https://quickchart.io/chart?c={type:'sparkline',data:{datasets:[{data:[1,2,3,2,4,3,5]}]}}`;
+  res.send(renderFrame("DEGEN Token", `Price: $${price}`, [
+    { label: "Back", target: "/" }
+  ]));
+});
 
-  res.setHeader("Content-Type", "text/html");
-  res.send(`
-    <html>
-      <head>
-        <meta property="og:title" content="${coin.toUpperCase()} • $${price}" />
-        <meta property="og:description" content="24h: ${change}% • MC: $${marketCap}B • Vol: $${volume}B" />
-        <meta property="og:image" content="${chartUrl}" />
-        <meta property="fc:frame" content="vNext" />
-        <meta property="fc:frame:button:1" content="BTC" />
-        <meta property="fc:frame:button:2" content="ETH" />
-        <meta property="fc:frame:button:3" content="SOL" />
-        <meta property="fc:frame:post_url" content="${process.env.BASE_URL}/api/action?coin=${coin}" />
-      </head>
-    </html>
-  `);
-}
+// AERO
+app.get("/aero", async (req, res) => {
+  const prices = await getTokenPrices();
+  const price = prices["aerodrome-finance"].usd;
+
+  res.send(renderFrame("AERO Token", `Price: $${price}`, [
+    { label: "Back", target: "/" }
+  ]));
+});
+
+// Gas Fee
+app.get("/gas", async (req, res) => {
+  const gas = await getGasAverage();
+
+  res.send(renderFrame("Base Gas Fee", `${gas} gwei`, [
+    { label: "Back", target: "/" }
+  ]));
+});
+
+// Transactions
+app.get("/tx", async (req, res) => {
+  const tx = await getDailyTxCount();
+  const latest = tx[tx.length - 1];
+  const info = latest ? `${latest.transactions} tx on ${latest.date}` : "No data";
+
+  res.send(renderFrame("Daily Transactions", info, [
+    { label: "Back", target: "/" }
+  ]));
+});
+
+// Active Wallets
+app.get("/wallets", async (req, res) => {
+  const wallets = await getActiveWallets();
+  const latest = wallets[wallets.length - 1];
+  const info = latest ? `${latest.users} wallets on ${latest.date}` : "No data";
+
+  res.send(renderFrame("Active Wallets", info, [
+    { label: "Back", target: "/" }
+  ]));
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
