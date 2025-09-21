@@ -1,7 +1,9 @@
+import Head from "next/head";
+
 export default function Home() {
   return (
     <>
-      <head>
+      <Head>
         <title>Crypto Market Snapshot</title>
         <meta property="og:title" content="Crypto Market Snapshot" />
         <meta
@@ -32,7 +34,8 @@ export default function Home() {
           name="fc:frame:post_url"
           content="https://crypto-market-snapshot.vercel.app/api/action"
         />
-      </head>
+      </Head>
+
       <main>
         <h1>Crypto Market Snapshot</h1>
         <p>
@@ -41,5 +44,5 @@ export default function Home() {
         </p>
       </main>
     </>
-  )
+  );
 }
