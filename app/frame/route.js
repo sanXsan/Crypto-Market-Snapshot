@@ -5,13 +5,12 @@ const COINGECKO = "https://api.coingecko.com/api/v3/simple/price";
 const DEXSCREENER = "https://api.dexscreener.com/latest/dex/tokens";
 const BASESCAN = "https://api.basescan.org/api";
 
-// Token address di Base
 const TOKENS = {
   DEGEN: "0x4ed4E862860bed51a9570b96d89aF5E1b0Efefed",
   AERO: "0x940181a94A35A4569E4529A3CDfB74e38Fd98631"
 };
 
-// helper fetch JSON
+
 async function jfetch(url) {
   const res = await fetch(url, { next: { revalidate: 30 } });
   return res.json();
