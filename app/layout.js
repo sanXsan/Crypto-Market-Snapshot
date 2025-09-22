@@ -1,3 +1,4 @@
+// layout
 export const metadata = {
   title: "Crypto Market Snapshot",
   description: "Miniapp for Base ecosystem market data"
