@@ -36,7 +36,6 @@ async function getBaseGas() {
   return parseInt(data.result, 16) / 1e9; // gwei
 }
 
-// Jumlah transaksi harian (BaseScan)
 async function getDailyTx() {
   const today = Math.floor(Date.now() / 1000);
   const yesterday = today - 86400;
@@ -59,7 +58,6 @@ function renderSVG(title, lines) {
   `;
 }
 
-// === HANDLER ===
 export async function POST(req) {
   const body = await req.json();
   const view = body?.view || "default";
