@@ -1,3 +1,4 @@
+export const runtime = "nodejs";
 import { NextResponse } from "next/server";
 
 const COINGECKO = "https://api.coingecko.com/api/v3/simple/price";

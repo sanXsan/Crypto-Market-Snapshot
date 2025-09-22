@@ -1,3 +1,4 @@
+export const runtime = "nodejs";
 import { NextResponse } from "next/server";
 
 const BASESCAN_API = "https://api.basescan.org/api";
