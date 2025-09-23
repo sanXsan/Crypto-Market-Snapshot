@@ -1,43 +1,52 @@
-import { ImageResponse } from "next/og";
+import { ImageResponse } from "@vercel/og"
 
-// Konfigurasi runtime agar pakai Edge
-export const runtime = "edge";
+export const config = {
+  runtime: "edge",
+}
 
-// API Route
-export async function GET(req) {
+export default async function handler(req) {
   try {
-    const { searchParams } = new URL(req.url);
-    const title = searchParams.get("title") || "Crypto Market Snapshot";
-    const desc = searchParams.get("desc") || "Base ecosystem data";
+    const { searchParams } = new URL(req.url)
+    const title = searchParams.get("title") || "Crypto Market Snapshot"
+    const desc = searchParams.get("desc") || "Base ecosystem data"
 
     return new ImageResponse(
       (
         <div
           style={{
+            display: "flex",
             width: "100%",
             height: "100%",
-            display: "flex",
             flexDirection: "column",
-            justifyContent: "center",
             alignItems: "center",
-            background: "linear-gradient(135deg,#0f172a,#1e293b)",
+            justifyContent: "center",
+            background: "linear-gradient(135deg, #141E30 0%, #243B55 100%)",
             color: "white",
-            fontFamily: "sans-serif",
-            padding: "40px",
-            textAlign: "center",
+            fontSize: 40,
+            fontFamily: "Arial, sans-serif",
           }}
         >
-          <h1 style={{ fontSize: 60, marginBottom: 20 }}>{title}</h1>
-          <p style={{ fontSize: 32, opacity: 0.9 }}>{desc}</p>
+          <div style={{ fontSize: 60, fontWeight: "bold", marginBottom: 20 }}>
+            {title}
+          </div>
+          <div style={{ fontSize: 36 }}>{desc}</div>
+          <div
+            style={{
+              marginTop: 40,
+              fontSize: 28,
+              opacity: 0.7,
+            }}
+          >
+            Powered by Base
+          </div>
         </div>
       ),
       {
         width: 800,
-        height: 400,
+        height: 418,
       }
-    );
+    )
   } catch (err) {
-    console.error("Render error:", err);
-    return new Response("Failed to generate image", { status: 500 });
+    return new Response("Failed to generate image", { status: 500 })
   }
 }
