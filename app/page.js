@@ -1,4 +1,6 @@
 // app/page.js
+import HomeClient from "./HomeClient"
+import { sdk } from '@farcaster/miniapp-sdk'
 
 export const metadata = {
   title: "Crypto Market Snapshot",
@@ -46,3 +48,4 @@ export default function Home() {
     </main>
   );
 }
+await sdk.actions.ready()
