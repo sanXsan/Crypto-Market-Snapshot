@@ -1,4 +1,5 @@
-// import dari homeclient
+// app/page.js
+
 import HomeClient from './HomeClient';
 
 export const metadata = {
@@ -28,10 +29,6 @@ export const metadata = {
       "https://crypto-market-snapshot.vercel.app/api/action",
   },
 };
-// homeclient
-export default function Page() {
-  return <HomeClient />;
-}
 
 export default function Home() {
   return (
@@ -48,6 +45,9 @@ export default function Home() {
         <li><a href="/basescan?type=gas">/basescan?type=gas</a></li>
         <li><a href="/render?title=Test&desc=Hello">/render</a></li>
       </ul>
+
+      {/* Render client-side component */}
+      <HomeClient />
     </main>
   );
 }
