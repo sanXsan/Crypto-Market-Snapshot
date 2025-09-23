@@ -1,8 +1,21 @@
 "use client";
 
-import Script from "next/script";
+import { useEffect } from "react";
+import { sdk } from "@farcaster/miniapp-sdk";
 
 export default function HomeClient() {
+  useEffect(() => {
+    const init = async () => {
+      try {
+        await sdk.actions.ready();
+        console.log("✅ Farcaster Miniapp ready() called");
+      } catch (err) {
+        console.error("❌ Error calling sdk.actions.ready()", err);
+      }
+    };
+    init();
+  }, []);
+
   return (
     <main style={{ padding: "2rem", fontFamily: "sans-serif" }}>
       <h1>Crypto Market Snapshot</h1>
@@ -17,18 +30,6 @@ export default function HomeClient() {
         <li><a href="/basescan?type=gas">/basescan?type=gas</a></li>
         <li><a href="/render?title=Test&desc=Hello">/render</a></li>
       </ul>
-
-      {/* Farcaster SDK → biar splash hilang */}
-      <Script
-        src="https://cdn.farcaster.xyz/sdk/v1.js"
-        strategy="afterInteractive"
-        onLoad={() => {
-          if (window.farcaster?.sdk) {
-            window.farcaster.sdk.actions.ready();
-            console.log("✅ Farcaster Miniapp ready()");
-          }
-        }}
-      />
     </main>
   );
 }
