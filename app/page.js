@@ -1,7 +1,4 @@
 // app/page.js
-"use client";
-
-import Script from "next/script";
 
 export const metadata = {
   title: "Crypto Market Snapshot",
@@ -36,7 +33,7 @@ export default function Home() {
     <main style={{ padding: "2rem", fontFamily: "sans-serif" }}>
       <h1>Crypto Market Snapshot</h1>
       <p>
-        This page powers the Warpcast Frame and Miniapp. <br />
+        This page powers the Warpcast Frame. <br />
         Open it inside Warpcast to interact with buttons:
       </p>
       <ul>
@@ -46,18 +43,6 @@ export default function Home() {
         <li><a href="/basescan?type=gas">/basescan?type=gas</a></li>
         <li><a href="/render?title=Test&desc=Hello">/render</a></li>
       </ul>
-
-      {/* Farcaster SDK → biar splash hilang */}
-      <Script
-        src="https://cdn.farcaster.xyz/sdk/v1.js"
-        strategy="afterInteractive"
-        onLoad={() => {
-          if (window.farcaster?.sdk) {
-            window.farcaster.sdk.actions.ready();
-            console.log("✅ Farcaster Miniapp ready()");
-          }
-        }}
-      />
     </main>
   );
 }
