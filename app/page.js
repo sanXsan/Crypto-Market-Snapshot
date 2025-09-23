@@ -1,6 +1,4 @@
-// app/page.js
-import HomeClient from "./HomeClient"
-import { sdk } from '@farcaster/miniapp-sdk'
+import HomeClient from './HomeClient';
 
 export const metadata = {
   title: "Crypto Market Snapshot",
@@ -29,6 +27,10 @@ export const metadata = {
       "https://crypto-market-snapshot.vercel.app/api/action",
   },
 };
+// homeclient
+export default function Page() {
+  return <HomeClient />;
+}
 
 export default function Home() {
   return (
@@ -48,4 +50,3 @@ export default function Home() {
     </main>
   );
 }
-await sdk.actions.ready()
