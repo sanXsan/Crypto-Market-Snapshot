@@ -1,3 +1,4 @@
+// import dari homeclient
 import HomeClient from './HomeClient';
 
 export const metadata = {

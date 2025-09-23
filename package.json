@@ -13,6 +13,7 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "@farcaster/miniapp-sdk": "^0.1.10",
     "@vercel/og": "^0.8.5",
     "axios": "^1.12.2",
     "dotenv": "^17.2.2",
