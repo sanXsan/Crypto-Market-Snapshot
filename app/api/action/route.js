@@ -1,120 +1,115 @@
-export const runtime = "nodejs";
+// app/api/action/route.js
 import { NextResponse } from "next/server";
-import { sdk } from "@farcaster/miniapp-sdk";
+
+const COINGECKO =
+  "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,degen-base,aerodrome-finance&vs_currencies=usd";
+const BASESCAN = "https://api.basescan.org/api";
+
+async function jfetch(url) {
+  const res = await fetch(url, { next: { revalidate: 30 } });
+  return res.json();
+}
 
 export async function POST(req) {
   try {
-    sdk.actions.ready();
     const body = await req.json();
     const buttonIndex = body.untrustedData?.buttonIndex || "1";
 
-    let title = "Crypto Market Snapshot";
-    let description = "Base ecosystem data";
-
-    const fetchJSON = async (url) => {
-      const r = await fetch(url);
-      return r.json();
-    };
-
-    // CoinGecko
-    const prices = await fetchJSON(
-      "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,degen-base,aerodrome-finance&vs_currencies=usd"
-    );
-
-    // BaseScan
-    const gasData = await fetchJSON(
-      "https://api.basescan.org/api?module=proxy&action=eth_gasPrice"
-    );
-    const txData = await fetchJSON(
-      "https://api.basescan.org/api?module=stats&action=dailytxn"
-    );
-    const walletData = await fetchJSON(
-      "https://api.basescan.org/api?module=stats&action=dailyactiveusers"
-    );
-
+    // ambil harga dari coingecko
+    const prices = await jfetch(COINGECKO);
     const btc = prices.bitcoin?.usd || "N/A";
     const eth = prices.ethereum?.usd || "N/A";
     const degen = prices["degen-base"]?.usd || "N/A";
     const aero = prices["aerodrome-finance"]?.usd || "N/A";
 
+    // ambil data dari basescan
+    const gasData = await jfetch(`${BASESCAN}?module=proxy&action=eth_gasPrice`);
     const gasGwei = gasData.result
       ? (parseInt(gasData.result, 16) / 1e9).toFixed(2)
       : "N/A";
 
-    const txCount =
-      txData.result?.length > 0
-        ? txData.result[txData.result.length - 1].transactionCount
-        : "N/A";
-
-    const wallets =
-      walletData.result?.length > 0
-        ? walletData.result[walletData.result.length - 1].uniqueAddressCount
-        : "N/A";
+    let title = "📊 Market Snapshot";
+    let lines = [];
 
     switch (buttonIndex) {
       case "1":
         title = "BTC & ETH";
-        description = `BTC: $${btc} | ETH: $${eth}`;
+        lines = [`BTC: $${btc}`, `ETH: $${eth}`];
         break;
       case "2":
-        title = "DEGEN Token";
-        description = `Price: $${degen}`;
+        title = "💎 DEGEN";
+        lines = [`Price: $${degen}`];
         break;
       case "3":
-        title = "AERO Token";
-        description = `Price: $${aero}`;
+        title = "🌀 AERO";
+        lines = [`Price: $${aero}`];
         break;
       case "4":
-        title = "Base Gas & Tx";
-        description = `Gas: ${gasGwei} gwei | Tx/day: ${txCount}`;
-        break;
-      case "5":
-        title = "Active Wallets";
-        description = `Daily active: ${wallets}`;
+        title = "⛽ Base Gas";
+        lines = [`Gas: ${gasGwei} gwei`];
         break;
       default:
-        title = "Crypto Market Snapshot";
-        description = "Choose an option";
+        lines = ["Choose an option"];
     }
 
-    const image = `https://crypto-market-snapshot.vercel.app/api/render?title=${encodeURIComponent(
-      title
-    )}&desc=${encodeURIComponent(description)}`;
+    // bikin gambar SVG sederhana
+    const svg = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="600" height="400">
+        <rect width="600" height="400" fill="black"/>
+        <text x="40" y="60" font-size="32" fill="white">${title}</text>
+        ${lines
+          .map(
+            (t, i) =>
+              `<text x="40" y="${140 + i * 40}" font-size="24" fill="orange">${t}</text>`
+          )
+          .join("")}
+        <text x="40" y="360" font-size="16" fill="gray">Data live • Base</text>
+      </svg>
+    `;
+    const imgBase64 = Buffer.from(svg).toString("base64");
 
-    return new Response(
-      `
-      <html>
-        <head>
-          <meta property="og:title" content="${title}" />
-          <meta property="og:description" content="${description}" />
-          <meta property="og:image" content="${image}" />
-
-          <meta name="fc:frame" content="vNext" />
-          <meta name="fc:frame:image" content="${image}" />
-          <meta name="fc:frame:button:1" content="BTC/ETH" />
-          <meta name="fc:frame:button:2" content="DEGEN" />
-          <meta name="fc:frame:button:3" content="AERO" />
-          <meta name="fc:frame:button:4" content="Gas & Tx" />
-          <meta name="fc:frame:button:5" content="Wallets" />
-          <meta name="fc:frame:post_url" content="https://crypto-market-snapshot.vercel.app/api/action" />
-        </head>
-        <body>
-          <h2>${title}</h2>
-          <p>${description}</p>
-        </body>
-      </html>
-    `,
-      { headers: { "Content-Type": "text/html" } }
-    );
+    return NextResponse.json({
+      "fc:frame": {
+        version: "vNext",
+        image: `data:image/svg+xml;base64,${imgBase64}`,
+        buttons: [
+          {
+            label: "BTC/ETH",
+            action: { type: "post", target: "/api/action", data: { view: "1" } },
+          },
+          {
+            label: "DEGEN",
+            action: { type: "post", target: "/api/action", data: { view: "2" } },
+          },
+          {
+            label: "AERO",
+            action: { type: "post", target: "/api/action", data: { view: "3" } },
+          },
+          {
+            label: "Gas",
+            action: { type: "post", target: "/api/action", data: { view: "4" } },
+          },
+          {
+            label: "Swap",
+            action: {
+              type: "open_url",
+              target: "https://app.uniswap.org/#/swap?chain=base",
+            },
+          },
+        ],
+      },
+    });
   } catch (err) {
     console.error("Action error:", err);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }
 
-// ✅ Tambahin GET biar kalau dibuka di browser gak 404
 export async function GET() {
   return NextResponse.json({
-    message: "Action endpoint ready. Use POST with Warpcast frame.",
+    message: "✅ Action endpoint ready for Warpcast",
   });
 }
