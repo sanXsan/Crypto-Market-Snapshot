@@ -1,6 +1,9 @@
 export const metadata = {
   title: "Base Market Snapshot",
   description: "Miniapp for Base ecosystem market data",
+  openGraph: {
+    images: ["/api/image"],
+  },
 };
 
 export default function RootLayout({ children }) {
@@ -10,3 +13,4 @@ export default function RootLayout({ children }) {
     </html>
   );
 }
+

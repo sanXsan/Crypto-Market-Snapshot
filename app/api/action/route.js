@@ -15,14 +15,14 @@ export async function POST(req) {
     const body = await req.json();
     const buttonIndex = body.untrustedData?.buttonIndex || "1";
 
-    // ambil harga dari coingecko
+    // --- ambil harga dari Coingecko ---
     const prices = await jfetch(COINGECKO);
     const btc = prices.bitcoin?.usd || "N/A";
     const eth = prices.ethereum?.usd || "N/A";
     const degen = prices["degen-base"]?.usd || "N/A";
     const aero = prices["aerodrome-finance"]?.usd || "N/A";
 
-    // ambil data dari basescan
+    // --- ambil gas dari Basescan ---
     const gasData = await jfetch(`${BASESCAN}?module=proxy&action=eth_gasPrice`);
     const gasGwei = gasData.result
       ? (parseInt(gasData.result, 16) / 1e9).toFixed(2)
@@ -52,43 +52,38 @@ export async function POST(req) {
         lines = ["Choose an option"];
     }
 
-    // bikin gambar SVG sederhana
+    // --- bikin gambar SVG dengan background Base (gradient biru) ---
     const svg = `
       <svg xmlns="http://www.w3.org/2000/svg" width="600" height="400">
-        <rect width="600" height="400" fill="black"/>
+        <defs>
+          <linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#0052FF"/>
+            <stop offset="100%" stop-color="#00C2FF"/>
+          </linearGradient>
+        </defs>
+        <rect width="600" height="400" fill="url(#grad)"/>
         <text x="40" y="60" font-size="32" fill="white">${title}</text>
         ${lines
           .map(
             (t, i) =>
-              `<text x="40" y="${140 + i * 40}" font-size="24" fill="orange">${t}</text>`
+              `<text x="40" y="${140 + i * 40}" font-size="24" fill="white">${t}</text>`
           )
           .join("")}
-        <text x="40" y="360" font-size="16" fill="gray">Data live • Base</text>
+        <text x="40" y="360" font-size="16" fill="white" opacity="0.7">Data live • Base</text>
       </svg>
     `;
     const imgBase64 = Buffer.from(svg).toString("base64");
 
+    // --- JSON response sesuai spec fc:frame ---
     return NextResponse.json({
       "fc:frame": {
         version: "vNext",
         image: `data:image/svg+xml;base64,${imgBase64}`,
         buttons: [
-          {
-            label: "BTC/ETH",
-            action: { type: "post", target: "/api/action", data: { view: "1" } },
-          },
-          {
-            label: "DEGEN",
-            action: { type: "post", target: "/api/action", data: { view: "2" } },
-          },
-          {
-            label: "AERO",
-            action: { type: "post", target: "/api/action", data: { view: "3" } },
-          },
-          {
-            label: "Gas",
-            action: { type: "post", target: "/api/action", data: { view: "4" } },
-          },
+          { label: "BTC/ETH", action: { type: "post", target: "/api/action" } },
+          { label: "DEGEN", action: { type: "post", target: "/api/action" } },
+          { label: "AERO", action: { type: "post", target: "/api/action" } },
+          { label: "Gas", action: { type: "post", target: "/api/action" } },
           {
             label: "Swap",
             action: {
