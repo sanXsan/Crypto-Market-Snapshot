@@ -1,7 +1,6 @@
-// layout
 export const metadata = {
-  title: "Crypto Market Snapshot",
-  description: "Miniapp for Base ecosystem market data"
+  title: "Base Market Snapshot",
+  description: "Miniapp for Base ecosystem market data",
 };
 
 export default function RootLayout({ children }) {
