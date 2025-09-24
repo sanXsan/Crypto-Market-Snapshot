@@ -1,13 +1,14 @@
+// app/api/render/route.js
 import { ImageResponse } from "@vercel/og"
 
 export const config = {
   runtime: "edge",
 }
 
-export default async function handler(req) {
+export async function GET(req) {
   try {
     const { searchParams } = new URL(req.url)
-    const title = searchParams.get("title") || "Crypto Market Snapshot"
+    const title = searchParams.get("title") || "📊 Base Market Snapshot"
     const desc = searchParams.get("desc") || "Base ecosystem data"
 
     return new ImageResponse(
