@@ -1,8 +1,10 @@
 export const runtime = "nodejs";
 import { NextResponse } from "next/server";
+import { sdk } from "@farcaster/miniapp-sdk";
 
 export async function POST(req) {
   try {
+    sdk.actions.ready();
     const body = await req.json();
     const buttonIndex = body.untrustedData?.buttonIndex || "1";
 

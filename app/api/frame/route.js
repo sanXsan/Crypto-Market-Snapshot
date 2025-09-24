@@ -1,5 +1,6 @@
 export const runtime = "nodejs";
 import { NextResponse } from "next/server";
+import { sdk } from "@farcaster/miniapp-sdk";
 
 const COINGECKO = "https://api.coingecko.com/api/v3/simple/price";
 const DEXSCREENER = "https://api.dexscreener.com/latest/dex/tokens";
@@ -13,6 +14,7 @@ const TOKENS = {
 
 async function jfetch(url) {
   const res = await fetch(url, { next: { revalidate: 30 } });
+  sdk.actions.ready();
   return res.json();
 }
 
