@@ -30,7 +30,7 @@ export default function Page() {
       <h1 style={{ fontSize: "1.8rem", marginBottom: "0.5rem" }}>
         📊 Base Market Snapshot
       </h1>
-      <p style={{ color: "#eee", marginBottom: "2rem" }}>
+      <p style={{ color: "#ffffffff", marginBottom: "2rem" }}>
         Select the data you want to see:
       </p>
 

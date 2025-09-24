@@ -1,8 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const runtime = "edge";
-
-// warna khas Base: #0052FF (biru gelap), #00C2FF (cyan terang)
+// warna khas Base: #1057f0ff (biru gelap), #00C2FF (cyan terang)
 export async function GET() {
   return new ImageResponse(
     (
