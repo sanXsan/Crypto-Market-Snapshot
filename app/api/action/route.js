@@ -9,10 +9,10 @@ async function jfetch(url) {
   return res.json();
 }
 
-export async function POST(req) {
+export async function GET(req) {
   try {
-    const body = await req.json();
-    const buttonIndex = body.untrustedData?.buttonIndex || "1";
+    const { searchParams } = new URL(req.url);
+    const view = searchParams.get("view") || "btceth";
 
     const prices = await jfetch(COINGECKO);
     const btc = prices.bitcoin?.usd || "N/A";
@@ -25,57 +25,38 @@ export async function POST(req) {
       ? (parseInt(gasData.result, 16) / 1e9).toFixed(2)
       : "N/A";
 
-    let title = "📊 Market Snapshot";
-    let desc = "Choose data";
+    let title = "📊 Base Market Snapshot";
+    let desc = "Select option";
 
-    switch (buttonIndex) {
-      case "1":
+    switch (view) {
+      case "btceth":
         title = "BTC & ETH";
         desc = `BTC: $${btc} • ETH: $${eth}`;
         break;
-      case "2":
+      case "degen":
         title = "💎 DEGEN";
         desc = `Price: $${degen}`;
         break;
-      case "3":
+      case "aero":
         title = "🌀 AERO";
         desc = `Price: $${aero}`;
         break;
-      case "4":
+      case "gas":
         title = "⛽ Gas Fee";
         desc = `${gasGwei} gwei`;
         break;
-      default:
-        desc = "Select option";
+      case "wallets":
+        title = "👛 Wallet Stats";
+        desc = "Feature coming soon...";
+        break;
     }
 
-    // Gunakan endpoint render untuk gambar
-    const imageUrl = `https://crypto-market-snapshot.vercel.app/api/render?title=${encodeURIComponent(
-      title
-    )}&desc=${encodeURIComponent(desc)}`;
-
-    return NextResponse.json({
-      "fc:frame": {
-        version: "vNext",
-        image: imageUrl,
-        post_url: "https://crypto-market-snapshot.vercel.app/api/action",
-        buttons: [
-          { label: "BTC/ETH", action: { type: "post", target: "/api/action" } },
-          { label: "DEGEN", action: { type: "post", target: "/api/action" } },
-          { label: "AERO", action: { type: "post", target: "/api/action" } },
-          { label: "Gas", action: { type: "post", target: "/api/action" } },
-          { label: "Swap", action: { type: "open_url", target: "https://app.uniswap.org/#/swap?chain=base" } },
-        ],
-      },
-    });
+    return NextResponse.json({ title, desc });
   } catch (err) {
-    console.error("Action error:", err);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    console.error("Market API error:", err);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
   }
-}
-
-export async function GET() {
-  return NextResponse.json({
-    message: "✅ Warpcast frame ready",
-  });
 }
